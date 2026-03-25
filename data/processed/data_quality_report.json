@@ -1,0 +1,131 @@
+{
+  "generated_at": "2026-03-24T08:04:11.046042+00:00",
+  "sources": {
+    "trade_flows": {
+      "source": "reporter",
+      "total_rows": 116390,
+      "year_range": [
+        2014,
+        2024
+      ],
+      "unique_partners": 223,
+      "unique_hs_codes": 96,
+      "flow_distribution": {
+        "Export": 59086,
+        "Import": 57304
+      },
+      "null_percentages": {
+        "trade_value_usd": 0.0,
+        "net_weight_kg": 39.79,
+        "quantity": 17.94,
+        "partner_iso3": 0.0
+      },
+      "value_distribution": {
+        "min": 1000.0,
+        "p25": 19000.0,
+        "median": 184000.0,
+        "mean": 13242142.87,
+        "p75": 1803000.0,
+        "p95": 36387200.0,
+        "max": 13219972000.0,
+        "sum": 1541253009000.0
+      },
+      "rows_per_year": {
+        "2014": 10419,
+        "2015": 10424,
+        "2016": 10460,
+        "2017": 10546,
+        "2018": 10367,
+        "2019": 10316,
+        "2020": 10465,
+        "2021": 10878,
+        "2022": 10885,
+        "2023": 10922,
+        "2024": 10708
+      }
+    },
+    "mirror_flows": {
+      "source": "mirror",
+      "total_rows": 766,
+      "year_range": [
+        2014,
+        2023
+      ],
+      "unique_partners": 1,
+      "unique_hs_codes": 96,
+      "flow_distribution": {
+        "Export": 384,
+        "Import": 382
+      },
+      "null_percentages": {
+        "trade_value_usd": 0.0,
+        "net_weight_kg": 47.52,
+        "quantity": 22.19,
+        "partner_iso3": 0.0
+      },
+      "value_distribution": {
+        "min": 2.0,
+        "p25": 281513.33,
+        "median": 3986153.5,
+        "mean": 83777879.42,
+        "p75": 34486603.5,
+        "p95": 392201066.25,
+        "max": 4418047084.0,
+        "sum": 64173855639.16
+      },
+      "rows_per_year": {
+        "2014": 192,
+        "2017": 191,
+        "2020": 191,
+        "2023": 192
+      }
+    },
+    "country_stats": {
+      "total_rows": 2453,
+      "unique_countries": 223,
+      "year_range": [
+        2014,
+        2024
+      ],
+      "null_percentages": {
+        "gdp_usd": 3.83,
+        "population": 0.0,
+        "gdp_per_capita": 3.83
+      },
+      "gdp_distribution": {
+        "min": 36811936.08,
+        "p25": 7173850088.75,
+        "median": 32387183730.1,
+        "mean": 1177914154558.86,
+        "p75": 220012814064.93,
+        "p95": 2443839483981.49,
+        "max": 67500141717526.3,
+        "sum": 2778699490604361.0
+      }
+    },
+    "hs_chapters": {
+      "total_rows": 99,
+      "columns": [
+        "chapter_code",
+        "chapter_int",
+        "chapter_name",
+        "section_num",
+        "section_name"
+      ]
+    },
+    "country_mapping": {
+      "total_rows": 296,
+      "columns": [
+        "iso3",
+        "name",
+        "region",
+        "income_group",
+        "iso2",
+        "capital",
+        "longitude",
+        "latitude",
+        "un_numeric"
+      ]
+    }
+  }
+}
