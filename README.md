@@ -1,49 +1,47 @@
 # GlobalTradeScope — Israel's Import/Export Dependency Analyzer
 
-A data engineering and analytics project that transforms a decade of UN Comtrade bilateral trade data into an interactive dashboard for identifying supply-chain dependencies, partner concentration risk, and commodity-level trade patterns.
+[![Live Demo](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://globaltradescope.streamlit.app/)
+
+A data engineering and analytics project that transforms a decade of UN Comtrade bilateral trade data (2014–2024) into an interactive dashboard for identifying supply-chain dependencies, partner concentration risk, and commodity-level trade patterns. Built as a portfolio project demonstrating end-to-end data pipeline design, star-schema warehousing, and analytical SQL.
 
 ---
 
-## What it does
+## Key Findings
 
-### Overview
-- Aggregates Israel's annual imports and exports from 2014 to 2024 into a single interactive view
-- Displays total trade value, active partner count, and trade balance with year-over-year deltas
-- Renders a filled area chart of imports vs exports over time, clearly showing deficit periods
-- Shows the top 20 trading partners in a treemap coloured by World Bank region
-- Breaks down trade by all 21 HS commodity sections in a grouped horizontal bar chart
-
-### Dependency Risk Analysis
-- Calculates the Herfindahl-Hirschman Index (HHI) for both partner and commodity concentration
-- Flags single-country dependencies where one partner supplies more than 30% of a commodity's import value
-- Visualises risk as a heatmap across all commodity × partner combinations over time
-- Tracks whether Israel's import sourcing is diversifying or concentrating year-on-year
-- Compares concentration levels against standard HHI thresholds (High ≥ 2500, Moderate ≥ 1500)
-
-### Partner Deep Dive
-- Allows selection of any trading partner with region and income-group filters
-- Shows bilateral trade balance — imports, exports, and net balance — over the full decade
-- Breaks down what Israel buys from and sells to the selected partner by HS chapter
-- Cross-references Israel's self-reported figures against the partner's mirror statistics
-- Adds macro context (GDP, GDP per capita, population) from World Bank indicators
-
-### Commodity Explorer
-- Lets users drill into any of the 99 HS 2-digit commodity chapters
-- Maps import sources — which countries supply the chapter, with share trends over time
-- Maps export destinations — where Israel sells each commodity
-- Computes a unit-value price proxy (trade value per kg) as a crude price index
-- Highlights sourcing shifts following supply-chain disruptions
-
-### Data Quality & Methodology
-- Displays pipeline run metadata: last ingest date and row counts per data source
-- Reports null rates per column across all fact tables
-- Shows foreign-key resolution rates (% of trade rows matched to a known country / commodity)
-- Identifies mirror-data gaps — years and partners with no coverage
-- Documents CIF vs FOB valuation conventions, HS revision handling, and API limits
+- **Persistent trade deficit, widening post-2020.** Israel's import bill exceeded exports in every year of the decade. The gap widened sharply after 2020, peaking at $15.7B in 2022 as post-COVID energy and goods prices surged.
+- **Netherlands controls 84% of live plant imports.** A single country dominates HS Chapter 06 (live trees and plants), flagging a critical single-source dependency in the horticultural supply chain.
+- **UAE trade surged after the Abraham Accords (2020).** The UAE entered Israel's top-20 import partners in 2021 and has expanded year-on-year, providing a visible, data-backed case study of the Accords' economic impact.
+- **China drives the largest mirror-data discrepancies.** Israel's self-reported China import figures diverge 62–96% from China's partner-reported figures across maritime and food sectors — consistent with Hong Kong re-export re-attribution.
+- **U.S. absorbs over 30% of all Israeli exports.** The United States is Israel's dominant export destination, with $186.6B across the decade — nearly 5x the second-largest destination (China at $41.4B).
 
 ---
 
-## Tech stack
+## Dashboard Pages
+
+| Page | What it shows |
+|---|---|
+| **Home** | Dataset summary — record counts, year range, partner count, total trade value |
+| **Trade Overview** | Imports vs exports over time, top-20 partners treemap, commodity section breakdown |
+| **Dependency Risk** | HHI concentration by commodity section, single-source dependency alerts (>30% share), risk heatmap |
+| **Partner Deep Dive** | Bilateral trade balance for any partner, HS chapter breakdown, mirror-data reconciliation, World Bank macro context |
+| **Commodity Explorer** | Source/destination maps, NTILE growth analysis for emerging suppliers, diversification trend (supplier count + HHI) |
+| **Data Quality** | Pipeline provenance, null rates, FK resolution rates, mirror-data gap analysis, methodology notes |
+
+---
+
+## Technical Highlights
+
+- **Star schema in DuckDB** — `fact_trade`, `fact_mirror_trade`, `fact_country_stats` joined to `dim_country`, `dim_commodity`, `dim_time`; surrogate keys generated with `ROW_NUMBER() OVER (...)`
+- **4-CTE HHI pipeline** — multi-step SQL computes partner and commodity Herfindahl-Hirschman Index per year; `ARG_MAX` window function identifies the dominant supplier in a single pass
+- **Two-stage FK resolution** — ISO3 lookup with UN numeric fallback in a single `INSERT … SELECT` handles non-standard country codes without post-load patching
+- **FULL OUTER JOIN mirror reconciliation** — Israel-reported and partner-reported flows joined across two fact tables to surface systematic reporting gaps
+- **NTILE(4) growth quartile ranking** — suppliers ranked by average annual growth rate into quartiles; new entrants (zero early-period presence) flagged and sorted separately
+- **LAG for year-over-year deltas** — window function computes YoY trade value change per partner directly in SQL, passed to the Streamlit metric delta parameter
+- **116,390 trade records** across 198 partner countries, 96 HS chapters, 11 years
+
+---
+
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -53,37 +51,11 @@ A data engineering and analytics project that transforms a decade of UN Comtrade
 | Dashboard | Streamlit · Plotly |
 | Fuzzy matching | `fuzzywuzzy` · `python-Levenshtein` |
 | Environment | `python-dotenv` |
-| Excel export | `openpyxl` |
+| Data sources | UN Comtrade API · World Bank API |
 
 ---
 
-## Key SQL / analytics skills demonstrated
-
-| Skill | Where used |
-|---|---|
-| **Star schema design** | `dim_country`, `dim_commodity`, `dim_time` → `fact_trade` |
-| **Window functions** | `ROW_NUMBER() OVER (ORDER BY …)` for surrogate key generation |
-| **CTEs** | Multi-step aggregations in dependency risk queries |
-| **Self-joins** | `fact_trade` joined twice to `dim_country` for reporter + partner |
-| **HHI calculation** | `SUM(share²) × 10 000` aggregated per commodity per year |
-| **Compound primary keys** | `fact_country_stats (country_id, year)` |
-| **Two-stage FK resolution** | ISO3 lookup → UN numeric fallback in a single INSERT SELECT |
-| **Pivot / unpivot** | Long → wide transformation for World Bank indicators |
-
----
-
-## Data sources
-
-| Source | What | Coverage |
-|---|---|---|
-| [UN Comtrade](https://comtrade.un.org/) | Bilateral trade flows (HS 2-digit) | 2014 – 2024, annual |
-| [UN Comtrade mirror](https://comtrade.un.org/) | Top-15 partners reporting on Israel | 2014, 2017, 2020, 2023 |
-| [World Bank API](https://datahelpdesk.worldbank.org/knowledgebase/articles/898581) | GDP (current USD), population | 2014 – 2024, all countries |
-| UN Harmonized System | HS chapter → section mapping | 99 chapters, 21 sections |
-
----
-
-## Quick start (Windows)
+## Quick Start (Windows)
 
 **1. Clone the repo**
 ```bat
@@ -127,38 +99,52 @@ streamlit run app.py
 
 ---
 
-## Project structure
+## Project Structure
 
 ```
 GlobalTradeScope/
-├── app.py                        # Streamlit home page
+├── app.py                        # Streamlit home page and dataset summary
 ├── pages/
-│   ├── 1_Overview.py             # Trade balance, partners, commodity mix
-│   ├── 2_Dependency_Risk.py      # HHI concentration analysis
-│   ├── 3_Partner_Deep_Dive.py    # Bilateral deep-dive + mirror comparison
-│   ├── 4_Commodity_Explorer.py   # HS chapter drill-down
-│   └── 5_Data_Quality.py         # Pipeline metadata & methodology
+│   ├── 1_Overview.py             # Trade balance, top partners, commodity mix
+│   ├── 2_Dependency_Risk.py      # HHI concentration analysis and risk heatmap
+│   ├── 3_Partner_Deep_Dive.py    # Bilateral deep-dive with mirror reconciliation
+│   ├── 4_Commodity_Explorer.py   # HS chapter drill-down and supplier growth analysis
+│   └── 5_Data_Quality.py         # Pipeline metadata, null rates, methodology notes
 ├── pipeline/
-│   ├── 01_ingest.py              # Download raw data → data/raw/
-│   ├── 02_clean.py               # Clean & transform → data/processed/
-│   └── 03_load_db.py             # Load DuckDB star schema
+│   ├── 01_ingest.py              # Download raw data from Comtrade and World Bank APIs
+│   ├── 02_clean.py               # Validate, normalise, and write to Parquet
+│   └── 03_load_db.py             # Build DuckDB star schema from processed files
 ├── utils/
 │   ├── db.py                     # Cached DuckDB connection helpers
-│   └── constants.py              # Colours, formatters, thresholds
+│   ├── constants.py              # Colour palettes, formatters, HHI thresholds
+│   ├── nav.py                    # Horizontal top navigation bar (mobile-friendly)
+│   └── styles.py                 # CSS injection for premium dashboard styling
 ├── sql/
-│   └── schema.sql                # DDL reference (matches 03_load_db.py)
+│   └── schema.sql                # DDL reference matching 03_load_db.py
 ├── data/
-│   ├── raw/                      # CSVs from ingest (gitignored)
-│   └── processed/                # Parquet files from clean (gitignored)
+│   ├── raw/                      # CSVs downloaded by ingest step (gitignored)
+│   └── processed/                # Parquet files produced by clean step (gitignored)
 ├── .streamlit/
-│   └── config.toml               # Theme and server settings
+│   └── config.toml               # Theme colours and server settings
 ├── requirements.txt
 └── env.example
 ```
 
 ---
 
+## Data Sources
+
+| Source | Content | Coverage |
+|---|---|---|
+| [UN Comtrade](https://comtrade.un.org/) | Bilateral trade flows at HS 2-digit level | 2014–2024, annual |
+| [UN Comtrade mirror](https://comtrade.un.org/) | Top-15 partners reporting on Israel | 2014, 2017, 2020, 2023 |
+| [World Bank API](https://datahelpdesk.worldbank.org/knowledgebase/articles/898581) | GDP (current USD), GDP per capita, population | 2014–2024, all countries |
+| UN Harmonized System | HS chapter to section mapping | 99 chapters, 21 sections |
+
+---
+
 ## Author
 
 **Mahmod Zoubi** — Industrial Engineering, Tel Aviv University
+
 [GitHub](https://github.com/MahmodZoabi) · [LinkedIn](https://www.linkedin.com/in/mahmod-zoabi/)
