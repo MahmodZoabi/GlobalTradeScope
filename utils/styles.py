@@ -170,6 +170,77 @@ h3 {{
     font-weight: 500 !important;
     font-size: 0.875rem !important;
 }}
+
+/* ── Top navigation bar ────────────────────────────────────────────────── */
+/* Non-active links */
+[data-testid="stPageLink"] a {{
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+    color: #475569 !important;
+    text-decoration: none !important;
+    display: block !important;
+    text-align: center !important;
+    padding: 0.35rem 0.25rem !important;
+    border-radius: 6px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}}
+[data-testid="stPageLink"] a:hover {{
+    background: #F1F5F9 !important;
+    color: {_ACCENT} !important;
+}}
+/* Active / current page — Streamlit renders disabled page_link as a <p> */
+[data-testid="stPageLink"] p {{
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+    color: {_ACCENT} !important;
+    text-align: center !important;
+    border-bottom: 2px solid {_ACCENT};
+    padding-bottom: 2px !important;
+    cursor: default !important;
+    margin: 0 auto !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}}
+
+/* ── Mobile responsive (≤ 768 px) ──────────────────────────────────────── */
+@media (max-width: 768px) {{
+    /* Hide sidebar; top nav is the only navigation on small screens */
+    [data-testid="stSidebar"],
+    [data-testid="collapsedControl"] {{
+        display: none !important;
+    }}
+    /* Tighter page padding */
+    .block-container {{
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+        padding-top: 1rem !important;
+    }}
+    /* Scale down headings */
+    h1 {{ font-size: 1.3rem !important; }}
+    h2 {{ font-size: 1.1rem !important; }}
+    h3 {{ font-size: 0.9rem !important; }}
+    /* Metric value size */
+    [data-testid="stMetric"] [data-testid="stMetricValue"] {{
+        font-size: 1.2rem !important;
+    }}
+    /* Allow metric cards to wrap into a 2-column grid */
+    [data-testid="stHorizontalBlock"] {{
+        flex-wrap: wrap !important;
+        gap: 0.5rem !important;
+    }}
+    [data-testid="column"] {{
+        min-width: 45% !important;
+        flex: 1 1 45% !important;
+    }}
+    /* Nav bar: allow horizontal scroll if labels don't fit */
+    [data-testid="stHorizontalBlock"]:has([data-testid="stPageLink"]) {{
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+    }}
+}}
 </style>
 """
 

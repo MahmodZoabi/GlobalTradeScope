@@ -9,6 +9,7 @@ import streamlit as st
 
 from utils.constants import APP_TITLE, COLORS, PLOTLY_TEMPLATE, SECTION_COLORS, fmt_usd, fmt_pct
 from utils.db import query, query_uncached
+from utils.nav import render_nav
 from utils.styles import inject_css
 
 st.set_page_config(
@@ -17,6 +18,7 @@ st.set_page_config(
     layout="wide",
 )
 inject_css()
+render_nav(__file__)
 
 # ---------------------------------------------------------------------------
 # World Bank region → colour (for treemap)

@@ -16,6 +16,7 @@ from utils.constants import (
     SECTION_COLORS, fmt_pct, fmt_usd,
 )
 from utils.db import query, query_uncached
+from utils.nav import render_nav
 from utils.styles import inject_css
 
 st.set_page_config(
@@ -24,6 +25,7 @@ st.set_page_config(
     layout="wide",
 )
 inject_css()
+render_nav(__file__)
 
 # ---------------------------------------------------------------------------
 # DB guard

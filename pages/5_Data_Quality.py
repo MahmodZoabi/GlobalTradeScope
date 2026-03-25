@@ -17,6 +17,7 @@ import streamlit as st
 
 from utils.constants import APP_TITLE, COLORS, PLOTLY_TEMPLATE, fmt_usd
 from utils.db import query, query_uncached
+from utils.nav import render_nav
 from utils.styles import inject_css
 
 st.set_page_config(
@@ -25,6 +26,7 @@ st.set_page_config(
     layout="wide",
 )
 inject_css()
+render_nav(__file__)
 
 BASE_DIR    = Path(__file__).resolve().parents[1]
 REPORT_PATH = BASE_DIR / "data" / "processed" / "data_quality_report.json"

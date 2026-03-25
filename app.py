@@ -6,6 +6,7 @@ import streamlit as st
 
 from utils.constants import APP_TITLE, fmt_usd
 from utils.db import query
+from utils.nav import render_nav
 from utils.styles import inject_css
 
 st.set_page_config(
@@ -14,6 +15,7 @@ st.set_page_config(
     layout="wide",
 )
 inject_css()
+render_nav(__file__)
 
 # ---------------------------------------------------------------------------
 # Sidebar
