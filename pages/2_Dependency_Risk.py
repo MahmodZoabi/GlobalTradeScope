@@ -510,6 +510,7 @@ ranked_suppliers AS (
 
 -- Keep only the dominant supplier rows where share > 50%
 SELECT
+    CASE WHEN share_pct >= 70 THEN 'HIGH' ELSE 'MODERATE' END AS risk_level,
     hs_chapter,
     description,
     section_name,
@@ -538,12 +539,6 @@ if alert_df.empty:
         "All commodity chapters have a dominant supplier below the 50% threshold.",
     )
 else:
-    # Add risk label and sort
-    def _risk(share: float) -> str:
-        return "HIGH" if share >= 70 else "MODERATE"
-
-    alert_df["risk_level"] = alert_df["share_pct"].apply(_risk)
-
     # Reorder columns for display
     display_cols = [
         "risk_level", "hs_chapter", "description", "section_name",
